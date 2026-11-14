@@ -21,6 +21,15 @@ class HasilPrediksi {
     required this.waktu,
   });
 
+  static const Map<String, String> catatanPerawatanTanaman = {
+    'Padi':
+        'Jaga genangan air 2–5 cm pada fase vegetatif dan keringkan lahan menjelang panen.',
+    'Jagung':
+        'Siram saat tanah mulai kering dan hindari genangan di sekitar perakaran.',
+    'Cabai':
+        'Gunakan mulsa untuk menjaga kelembapan tanah dan siram pada pagi atau sore hari.',
+  };
+
   String get status {
     if (kelembapanTanah < 40) {
       return 'Kering';
@@ -34,25 +43,18 @@ class HasilPrediksi {
   String get rekomendasi {
     switch (status) {
       case 'Kering':
-        return 'Segera lakukan Penyiraman atau irigasi';
+        return 'Segera lakukan penyiraman atau irigasi';
       case 'Optimal':
         return 'Pertahankan pola perawatan saat ini';
       case 'Terlalu Lembap':
       default:
-        return 'Kurangi Penyiraman dan periksa drainase';
+        return 'Kurangi penyiraman dan periksa drainase';
     }
   }
 
   String get catatanPerawatan {
-    switch (tanaman) {
-      case 'Padi':
-        return 'Jaga Genangan air 2-5cm pada fase vegetatif dan keringkan lahan menjelang panen';
-      case 'Jagung':
-        return 'Siram saat tanah mulai kering dan hindari genangan di sekitar perakaran';
-      case 'Cabai':
-      default:
-        return 'Gunakan Mulsa untuk menjaga kelembapan tanah dan siram pada pagi atau sore hari.';
-    }
+    return catatanPerawatanTanaman[tanaman] ??
+        'Pantau kondisi tanaman secara rutin.';
   }
 
   IconData get ikonStatus {

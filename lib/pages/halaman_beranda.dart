@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../main.dart';
 
 class HalamanBeranda extends StatelessWidget {
   final VoidCallback? onBukaTabPrediksi;
@@ -13,7 +14,7 @@ class HalamanBeranda extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: [
         Text(
-          'Selamat Datang di AgriClima LTSM',
+          'Selamat Datang di AgriClima LSTM',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -33,7 +34,7 @@ class HalamanBeranda extends StatelessWidget {
           contentPadding: EdgeInsets.zero,
           leading: const Icon(Icons.memory, size: 32),
           title: Text(
-            'Model: LTSM (Deep Learning)',
+            'Model: LSTM (Deep Learning)',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -47,7 +48,7 @@ class HalamanBeranda extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         ElevatedButton.icon(
-          onPressed: () => Navigator.pushNamed(context, '/tentang'),
+          onPressed: () => Navigator.pushNamed(context, AppRoutes.tentang),
           icon: const Icon(Icons.info_outline),
           label: const Text('Tentang Aplikasi'),
         ),

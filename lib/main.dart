@@ -90,8 +90,8 @@ class _KerangkaNavigasiState extends State<KerangkaNavigasi> {
 
   @override
   Widget build(BuildContext context) {
-    final totalData = context.select<PrediksiBloc, int>(
-      (bloc) => bloc.state.totalSemuaPrediksi,
+    final jumlahPerluTindakan = context.select<PrediksiBloc, int>(
+      (bloc) => bloc.state.totalPerluTindakan,
     );
 
     return Scaffold(
@@ -112,13 +112,13 @@ class _KerangkaNavigasiState extends State<KerangkaNavigasi> {
           ),
           NavigationDestination(
             icon: Badge(
-              isLabelVisible: totalData > 0,
-              label: Text('$totalData'),
+              isLabelVisible: jumlahPerluTindakan > 0,
+              label: Text('$jumlahPerluTindakan'),
               child: const Icon(Icons.eco_outlined),
             ),
             selectedIcon: Badge(
-              isLabelVisible: totalData > 0,
-              label: Text('$totalData'),
+              isLabelVisible: jumlahPerluTindakan > 0,
+              label: Text('$jumlahPerluTindakan'),
               child: const Icon(Icons.eco),
             ),
             label: 'Prediksi',

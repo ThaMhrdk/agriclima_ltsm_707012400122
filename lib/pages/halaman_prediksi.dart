@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../main.dart';
 import '../state/prediksi_bloc.dart';
 import '../widgets/prediksi_card.dart';
 import '../widgets/stat_card.dart';
@@ -17,9 +18,10 @@ class HalamanPrediksi extends StatelessWidget {
 
         return Scaffold(
           floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => Navigator.pushNamed(context, '/input-prediksi'),
+            onPressed: () =>
+                Navigator.pushNamed(context, AppRoutes.inputPrediksi),
             icon: const Icon(Icons.add),
-            label: const Text('Prediksi baru'),
+            label: const Text('Prediksi Baru'),
           ),
           body: Padding(
             padding: const EdgeInsets.all(16),
@@ -79,6 +81,7 @@ class HalamanPrediksi extends StatelessWidget {
                   child: daftar.isEmpty
                       ? const Center(child: Text('Belum ada data'))
                       : ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 80),
                           itemCount: daftar.length,
                           itemBuilder: (context, index) {
                             final item = daftar[index];
@@ -87,7 +90,7 @@ class HalamanPrediksi extends StatelessWidget {
                               onUbah: () {
                                 Navigator.pushNamed(
                                   context,
-                                  '/input-prediksi',
+                                  AppRoutes.inputPrediksi,
                                   arguments: item,
                                 );
                               },

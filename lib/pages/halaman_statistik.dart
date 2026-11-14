@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +18,9 @@ class HalamanStatistik extends StatelessWidget {
         final jmlKering = dataStatus['Kering'] ?? 0;
         final jmlOptimal = dataStatus['Optimal'] ?? 0;
         final jmlLembap = dataStatus['Terlalu Lembap'] ?? 0;
+        final maxJumlah = max(jmlKering, max(jmlOptimal, jmlLembap));
+        final maxY = (maxJumlah < 5 ? 5 : maxJumlah + 1).toDouble();
+        final intervalY = maxY <= 10 ? 1.0 : (maxY / 5).ceilToDouble();
 
         return Padding(
           padding: const EdgeInsets.all(16),
@@ -23,22 +28,19 @@ class HalamanStatistik extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Statistik Status Mikroklimat',
+                'Jumlah Prediksi per Status Mikroklimat',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Kering: $jmlKering | Optimal: $jmlOptimal | Terlalu Lembap: $jmlLembap',
-                style: TextStyle(color: colorScheme.onSurfaceVariant),
-              ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               Expanded(
                 child: BarChart(
                   BarChartData(
+                    minY: 0,
+                    maxY: maxY,
                     titlesData: FlTitlesData(
                       topTitles: const AxisTitles(
                         sideTitles: SideTitles(showTitles: false),
@@ -46,20 +48,54 @@ class HalamanStatistik extends StatelessWidget {
                       rightTitles: const AxisTitles(
                         sideTitles: SideTitles(showTitles: false),
                       ),
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 28,
+                          interval: intervalY,
+                          getTitlesWidget: (value, meta) {
+                            if (value % 1 != 0) {
+                              return const SizedBox.shrink();
+                            }
+                            return Text(
+                              '${value.toInt()}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
+                          reservedSize: 30,
                           getTitlesWidget: (value, meta) {
+                            String label;
                             switch (value.toInt()) {
                               case 0:
-                                return const Text('Kering');
+                                label = 'Kering';
+                                break;
                               case 1:
-                                return const Text('Optimal');
+                                label = 'Optimal';
+                                break;
                               case 2:
-                                return const Text('Terlalu Lembap');
+                                label = 'Terlalu Lembap';
+                                break;
                               default:
-                                return const Text('');
+                                label = '';
                             }
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Text(
+                                label,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                            );
                           },
                         ),
                       ),

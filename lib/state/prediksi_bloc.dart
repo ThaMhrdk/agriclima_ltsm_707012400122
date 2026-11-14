@@ -69,6 +69,12 @@ class PrediksiState {
 
   int get totalSemuaPrediksi => daftarPrediksi.length;
 
+  int get totalPerluTindakan => daftarPrediksi
+      .where(
+        (item) => item.status == 'Kering' || item.status == 'Terlalu Lembap',
+      )
+      .length;
+
   List<HasilPrediksi> get daftarTersaring {
     if (filterPetak == 'Semua') {
       return daftarPrediksi;

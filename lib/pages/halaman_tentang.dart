@@ -24,7 +24,7 @@ class HalamanTentang extends StatelessWidget {
           const Card(
             child: ListTile(
               leading: Icon(Icons.eco),
-              title: Text('AgriClima LTSM'),
+              title: Text('AgriClima LSTM'),
               subtitle: Text(
                 'Aplikasi pemantauan dan prediksi mikroklimat 24 jam ke depan untuk menentukan status lahan dan rekomendasi perawatan tanaman.',
               ),

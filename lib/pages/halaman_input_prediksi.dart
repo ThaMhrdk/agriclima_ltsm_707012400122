@@ -20,6 +20,11 @@ class _HalamanInputPrediksiState extends State<HalamanInputPrediksi> {
   String tanamanTerpilih = 'Padi';
   bool dataSudahBenar = false;
   bool sudahIsiDataEdit = false;
+  bool sudahValidasi = false;
+  bool suhuDisentuh = false;
+  bool kelembapanUdaraDisentuh = false;
+  bool kelembapanTanahDisentuh = false;
+  bool petugasDisentuh = false;
 
   @override
   void didChangeDependencies() {
@@ -30,13 +35,9 @@ class _HalamanInputPrediksiState extends State<HalamanInputPrediksi> {
       if (dataEdit != null) {
         petakTerpilih = dataEdit.petak;
         tanamanTerpilih = dataEdit.tanaman;
-        suhuController.text = dataEdit.suhuUdara.toInt().toString();
-        kelembapanUdaraController.text = dataEdit.kelembapanUdara
-            .toInt()
-            .toString();
-        kelembapanTanahController.text = dataEdit.kelembapanTanah
-            .toInt()
-            .toString();
+        suhuController.text = dataEdit.suhuUdara.toString();
+        kelembapanUdaraController.text = dataEdit.kelembapanUdara.toString();
+        kelembapanTanahController.text = dataEdit.kelembapanTanah.toString();
         petugasController.text = dataEdit.namaPetugas;
       }
       sudahIsiDataEdit = true;
@@ -45,23 +46,44 @@ class _HalamanInputPrediksiState extends State<HalamanInputPrediksi> {
 
   String? get errorSuhu {
     final teks = suhuController.text.trim();
-    if (teks.isEmpty || double.tryParse(teks) == null) {
+    if (teks.isEmpty) {
+      if (sudahValidasi || suhuDisentuh) {
+        return 'Suhu harus berupa angka';
+      }
+      return null;
+    }
+    final nilai = double.tryParse(teks);
+    if (nilai == null || !nilai.isFinite) {
       return 'Suhu harus berupa angka';
     }
     return null;
   }
 
   String? get errorKelembapanUdara {
-    final nilai = double.tryParse(kelembapanUdaraController.text.trim());
-    if (nilai == null || nilai < 0 || nilai > 100) {
+    final teks = kelembapanUdaraController.text.trim();
+    if (teks.isEmpty) {
+      if (sudahValidasi || kelembapanUdaraDisentuh) {
+        return 'Kelembapan udara harus angka 0-100';
+      }
+      return null;
+    }
+    final nilai = double.tryParse(teks);
+    if (nilai == null || !nilai.isFinite || nilai < 0 || nilai > 100) {
       return 'Kelembapan udara harus angka 0-100';
     }
     return null;
   }
 
   String? get errorKelembapanTanah {
-    final nilai = double.tryParse(kelembapanTanahController.text.trim());
-    if (nilai == null || nilai < 0 || nilai > 100) {
+    final teks = kelembapanTanahController.text.trim();
+    if (teks.isEmpty) {
+      if (sudahValidasi || kelembapanTanahDisentuh) {
+        return 'Kelembapan tanah harus angka 0-100';
+      }
+      return null;
+    }
+    final nilai = double.tryParse(teks);
+    if (nilai == null || !nilai.isFinite || nilai < 0 || nilai > 100) {
       return 'Kelembapan tanah harus angka 0-100';
     }
     return null;
@@ -69,16 +91,29 @@ class _HalamanInputPrediksiState extends State<HalamanInputPrediksi> {
 
   String? get errorPetugas {
     if (petugasController.text.trim().isEmpty) {
-      return 'Nama petugas tidak boleh kosong';
+      if (sudahValidasi || petugasDisentuh) {
+        return 'Nama petugas tidak boleh kosong';
+      }
     }
     return null;
   }
 
-  bool get formValid =>
-      errorSuhu == null &&
-      errorKelembapanUdara == null &&
-      errorKelembapanTanah == null &&
-      errorPetugas == null;
+  bool get formValid {
+    final suhu = double.tryParse(suhuController.text.trim());
+    final kUdara = double.tryParse(kelembapanUdaraController.text.trim());
+    final kTanah = double.tryParse(kelembapanTanahController.text.trim());
+    return suhu != null &&
+        suhu.isFinite &&
+        kUdara != null &&
+        kUdara.isFinite &&
+        kUdara >= 0 &&
+        kUdara <= 100 &&
+        kTanah != null &&
+        kTanah.isFinite &&
+        kTanah >= 0 &&
+        kTanah <= 100 &&
+        petugasController.text.trim().isNotEmpty;
+  }
 
   @override
   void dispose() {
@@ -91,7 +126,9 @@ class _HalamanInputPrediksiState extends State<HalamanInputPrediksi> {
 
   void konfirmasiSimpan() {
     if (!formValid) {
-      setState(() {});
+      setState(() {
+        sudahValidasi = true;
+      });
       return;
     }
 
@@ -112,7 +149,7 @@ class _HalamanInputPrediksiState extends State<HalamanInputPrediksi> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Konfirmasi Simpan'),
+        title: const Text('Konfirmasi'),
         content: Text(
           'Simpan prediksi ${prediksi.tanaman} di ${prediksi.petak}?\n'
           'Status: ${prediksi.status}',
@@ -131,11 +168,11 @@ class _HalamanInputPrediksiState extends State<HalamanInputPrediksi> {
               }
               Navigator.pop(dialogContext);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Data Tersimpan')),
+                const SnackBar(content: Text('Data tersimpan')),
               );
               Navigator.pop(context);
             },
-            child: const Text('Simpan'),
+            child: const Text('Ya, Simpan'),
           ),
         ],
       ),
@@ -144,14 +181,19 @@ class _HalamanInputPrediksiState extends State<HalamanInputPrediksi> {
 
   @override
   Widget build(BuildContext context) {
+    final dataEdit =
+        ModalRoute.of(context)?.settings.arguments as HasilPrediksi?;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Input Hasil Prediksi')),
+      appBar: AppBar(
+        title: Text(dataEdit != null ? 'Ubah Prediksi' : 'Input Prediksi'),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Pilih Petak:'),
+            const Text('Petak'),
             RadioGroup<String>(
               groupValue: petakTerpilih,
               onChanged: (nilai) {
@@ -195,35 +237,47 @@ class _HalamanInputPrediksiState extends State<HalamanInputPrediksi> {
             const SizedBox(height: 12),
             TextField(
               controller: suhuController,
-              keyboardType: TextInputType.number,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: InputDecoration(
                 labelText: 'Prediksi Suhu Udara (°C)',
                 border: const OutlineInputBorder(),
                 errorText: errorSuhu,
               ),
-              onChanged: (_) => setState(() {}),
+              onChanged: (_) => setState(() {
+                suhuDisentuh = true;
+              }),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: kelembapanUdaraController,
-              keyboardType: TextInputType.number,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: InputDecoration(
                 labelText: 'Prediksi Kelembapan Udara (%)',
                 border: const OutlineInputBorder(),
                 errorText: errorKelembapanUdara,
               ),
-              onChanged: (_) => setState(() {}),
+              onChanged: (_) => setState(() {
+                kelembapanUdaraDisentuh = true;
+              }),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: kelembapanTanahController,
-              keyboardType: TextInputType.number,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: InputDecoration(
                 labelText: 'Prediksi Kelembapan Tanah (%)',
                 border: const OutlineInputBorder(),
                 errorText: errorKelembapanTanah,
               ),
-              onChanged: (_) => setState(() {}),
+              onChanged: (_) => setState(() {
+                kelembapanTanahDisentuh = true;
+              }),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -233,11 +287,13 @@ class _HalamanInputPrediksiState extends State<HalamanInputPrediksi> {
                 border: const OutlineInputBorder(),
                 errorText: errorPetugas,
               ),
-              onChanged: (_) => setState(() {}),
+              onChanged: (_) => setState(() {
+                petugasDisentuh = true;
+              }),
             ),
             CheckboxListTile(
               value: dataSudahBenar,
-              title: const Text('Data sudah Benar'),
+              title: const Text('Data sudah benar'),
               onChanged: (nilai) {
                 setState(() {
                   dataSudahBenar = nilai ?? false;

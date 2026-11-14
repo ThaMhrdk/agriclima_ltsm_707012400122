@@ -40,7 +40,7 @@ class PrediksiCard extends StatelessWidget {
                 ),
               ),
               subtitle: Text(
-                'Status: ${prediksi.status}',
+                prediksi.status,
                 style: TextStyle(
                   color: prediksi.warnaStatus,
                   fontWeight: FontWeight.w600,
@@ -63,7 +63,7 @@ class PrediksiCard extends StatelessWidget {
               ),
             ),
             Text(
-              'Kelembapan Tanah: ${prediksi.kelembapanTanah.toInt()}%',
+              'Kelembapan tanah: ${prediksi.kelembapanTanah.toStringAsFixed(1)}%',
               style: TextStyle(color: colorScheme.onSurface),
             ),
             const SizedBox(height: 4),
@@ -73,12 +73,12 @@ class PrediksiCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Suhu Udara: ${prediksi.suhuUdara.toInt()} °C',
+              'Suhu udara: ${prediksi.suhuUdara.toStringAsFixed(1)} °C',
               style: TextStyle(color: colorScheme.onSurface),
             ),
             const SizedBox(height: 2),
             Text(
-              'Kelembapan Udara: ${prediksi.kelembapanUdara.toInt()}%',
+              'Kelembapan udara: ${prediksi.kelembapanUdara.toStringAsFixed(1)}%',
               style: TextStyle(color: colorScheme.onSurface),
             ),
             const SizedBox(height: 6),
@@ -88,7 +88,7 @@ class PrediksiCard extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              'Catatan ${prediksi.tanaman}: ${prediksi.catatanPerawatan}',
+              'Catatan: ${prediksi.catatanPerawatan}',
               style: TextStyle(
                 fontSize: 12,
                 color: colorScheme.onSurfaceVariant,
