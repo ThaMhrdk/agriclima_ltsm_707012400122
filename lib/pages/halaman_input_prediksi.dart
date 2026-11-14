@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../models/hasil_prediksi.dart';
 import '../state/prediksi_bloc.dart';
 
@@ -167,9 +168,9 @@ class _HalamanInputPrediksiState extends State<HalamanInputPrediksi> {
                 context.read<PrediksiBloc>().add(TambahPrediksiEvent(prediksi));
               }
               Navigator.pop(dialogContext);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Data tersimpan')),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Data tersimpan')));
               Navigator.pop(context);
             },
             child: const Text('Ya, Simpan'),

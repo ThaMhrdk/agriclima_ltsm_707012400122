@@ -36,73 +36,135 @@ void main() {
     expect(find.text('Prediksi Baru'), findsOneWidget);
   });
 
-  testWidgets('Badge hanya menghitung data Perlu Tindakan dan form validasi bekerja', (
-    WidgetTester tester,
-  ) async {
-    final bloc = PrediksiBloc();
-    bloc.add(
-      TambahPrediksiEvent(
-        HasilPrediksi(
-          id: '1',
-          petak: 'Petak 1',
-          tanaman: 'Padi',
-          suhuUdara: 28,
-          kelembapanUdara: 70,
-          kelembapanTanah: 55,
-          namaPetugas: 'Ani',
-          waktu: DateTime(2026, 10, 22, 10, 0),
+  testWidgets(
+    'Badge hanya menghitung data Perlu Tindakan, mode gelap, dan form bekerja',
+    (WidgetTester tester) async {
+      final bloc = PrediksiBloc();
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const AgriClimaApp(),
         ),
-      ),
-    );
-    bloc.add(
-      TambahPrediksiEvent(
-        HasilPrediksi(
-          id: '2',
-          petak: 'Petak 2',
-          tanaman: 'Cabai',
-          suhuUdara: 29,
-          kelembapanUdara: 75,
-          kelembapanTanah: 35,
-          namaPetugas: 'Budi',
-          waktu: DateTime(2026, 10, 22, 15, 7),
+      );
+
+      bloc.add(
+        TambahPrediksiEvent(
+          HasilPrediksi(
+            id: '1',
+            petak: 'Petak 1',
+            tanaman: 'Padi',
+            suhuUdara: 28,
+            kelembapanUdara: 70,
+            kelembapanTanah: 55,
+            namaPetugas: 'Ani',
+            waktu: DateTime(2026, 10, 22, 10, 0),
+          ),
         ),
-      ),
-    );
-    bloc.add(
-      TambahPrediksiEvent(
-        HasilPrediksi(
-          id: '3',
-          petak: 'Petak 1',
-          tanaman: 'Jagung',
-          suhuUdara: 25,
-          kelembapanUdara: 85,
-          kelembapanTanah: 80,
-          namaPetugas: 'Cici',
-          waktu: DateTime(2026, 10, 22, 16, 0),
+      );
+      bloc.add(
+        TambahPrediksiEvent(
+          HasilPrediksi(
+            id: '2',
+            petak: 'Petak 2',
+            tanaman: 'Cabai',
+            suhuUdara: 29,
+            kelembapanUdara: 75,
+            kelembapanTanah: 35,
+            namaPetugas: 'Budi',
+            waktu: DateTime(2026, 10, 22, 15, 7),
+          ),
         ),
-      ),
-    );
+      );
+      bloc.add(
+        TambahPrediksiEvent(
+          HasilPrediksi(
+            id: '3',
+            petak: 'Petak 1',
+            tanaman: 'Jagung',
+            suhuUdara: 25,
+            kelembapanUdara: 85,
+            kelembapanTanah: 80,
+            namaPetugas: 'Cici',
+            waktu: DateTime(2026, 10, 22, 16, 0),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
-    await tester.pumpWidget(
-      BlocProvider.value(
-        value: bloc,
-        child: const AgriClimaApp(),
-      ),
-    );
-    await tester.pumpAndSettle();
+      final badge = tester.widget<Badge>(find.byType(Badge).first);
+      expect(badge.isLabelVisible, isTrue);
+      expect((badge.label as Text).data, '2');
 
-    final badge = tester.widget<Badge>(find.byType(Badge).first);
-    expect(badge.isLabelVisible, isTrue);
-    expect((badge.label as Text).data, '2');
+      await tester.tap(find.text('Pengaturan'));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.byType(Switch));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(bloc.state.isModeGelap, isTrue);
 
-    await tester.tap(find.text('Pengaturan'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byType(Switch));
-    await tester.pumpAndSettle();
-    expect(bloc.state.isModeGelap, isTrue);
+      await tester.tap(find.text('Prediksi'));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.text('Prediksi Baru'));
+      await tester.pumpAndSettle();
 
-    await bloc.close();
-  });
+      await tester.enterText(find.byType(TextField).at(0), 'abc');
+      await tester.enterText(find.byType(TextField).at(1), '150');
+      await tester.enterText(find.byType(TextField).at(2), '-5');
+      await tester.pump();
+      expect(find.text('Suhu harus berupa angka'), findsOneWidget);
+      expect(find.text('Kelembapan udara harus angka 0-100'), findsOneWidget);
+      expect(find.text('Kelembapan tanah harus angka 0-100'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField).at(0), '29');
+      await tester.enterText(find.byType(TextField).at(1), '75');
+      await tester.enterText(find.byType(TextField).at(2), '35');
+      await tester.enterText(find.byType(TextField).at(3), 'Dedi');
+      await tester.pump();
+
+      await tester.ensureVisible(find.text('Data sudah benar'));
+      await tester.tap(find.text('Data sudah benar'));
+      await tester.pump();
+      await tester.ensureVisible(find.text('Simpan'));
+      await tester.tap(find.text('Simpan'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Konfirmasi'), findsOneWidget);
+      await tester.tap(find.text('Ya, Simpan'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Data tersimpan'), findsOneWidget);
+      expect(bloc.state.totalSemuaPrediksi, 4);
+      expect(bloc.state.totalPerluTindakan, 3);
+
+      await tester.tap(find.text('Petak 1'));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(bloc.state.filterPetak, 'Petak 1');
+      expect(bloc.state.totalPrediksi, 3);
+
+      await tester.tap(find.text('Statistik'));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(
+        find.text('Jumlah Prediksi per Status Mikroklimat'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Pengaturan'));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.text('Muat Data Simulasi'));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(bloc.state.totalSemuaPrediksi, 14);
+
+      await tester.tap(find.text('Hapus Semua Data'));
+      await tester.pumpAndSettle();
+      expect(find.text('Hapus Semua Data'), findsWidgets);
+      await tester.tap(find.text('Hapus'));
+      await tester.pumpAndSettle();
+      expect(bloc.state.totalSemuaPrediksi, 0);
+    },
+    timeout: const Timeout(Duration(seconds: 20)),
+  );
 
   test('HasilPrediksi dan buatDataSimulasi memenuhi aturan Tabel A, B, dan rentang nilai', () {
     final kering = HasilPrediksi(
@@ -118,6 +180,10 @@ void main() {
     expect(kering.status, 'Kering');
     expect(kering.rekomendasi, 'Segera lakukan penyiraman atau irigasi');
     expect(kering.warnaStatus, Colors.orange);
+    expect(
+      kering.catatanPerawatan,
+      'Jaga genangan air 2–5 cm pada fase vegetatif dan keringkan lahan menjelang panen.',
+    );
 
     final optimal = HasilPrediksi(
       id: 'o',

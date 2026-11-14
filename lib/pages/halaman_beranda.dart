@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../main.dart';
 
 class HalamanBeranda extends StatelessWidget {
@@ -24,10 +25,7 @@ class HalamanBeranda extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           'Aplikasi untuk mencatat hasil prediksi mikroklimat tanaman di lahan Kelompok Tani Sri Mulya, agar kebutuhan penyiraman tiap petak mudah dipantau.',
-          style: TextStyle(
-            fontSize: 14,
-            color: colorScheme.onSurfaceVariant,
-          ),
+          style: TextStyle(fontSize: 14, color: colorScheme.onSurfaceVariant),
         ),
         const SizedBox(height: 16),
         ListTile(

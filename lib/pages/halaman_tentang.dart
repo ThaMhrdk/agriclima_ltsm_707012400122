@@ -82,7 +82,9 @@ class HalamanTentang extends StatelessWidget {
             child: ListTile(
               leading: Icon(Icons.water_drop),
               title: Text('Kelembapan Tanah (%)'),
-              subtitle: Text('Parameter kelembapan tanah penentu status (0 - 100%)'),
+              subtitle: Text(
+                'Parameter kelembapan tanah penentu status (0 - 100%)',
+              ),
             ),
           ),
         ],

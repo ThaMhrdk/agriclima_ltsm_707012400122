@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../main.dart';
 import '../state/prediksi_bloc.dart';
 import '../widgets/prediksi_card.dart';

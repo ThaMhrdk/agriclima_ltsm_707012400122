@@ -4,11 +4,7 @@ class StatCard extends StatelessWidget {
   final String judul;
   final int nilai;
 
-  const StatCard({
-    super.key,
-    required this.judul,
-    required this.nilai,
-  });
+  const StatCard({super.key, required this.judul, required this.nilai});
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +28,7 @@ class StatCard extends StatelessWidget {
             judul,
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 12,
-              color: colorScheme.onSurfaceVariant,
-            ),
+            style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
           ),
         ],
       ),
